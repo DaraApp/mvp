@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=dara_db
+      - POSTGRES_USER=dara_user
+      - POSTGRES_PASSWORD=dara_password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dara_user -d dara_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    command: gunicorn dara.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-(@2&j&=rulz3w$$y95zgh&9&fumha42n509s8__br7=#px^6&9f
+      - DATABASE_URL=postgresql://dara_user:dara_password@db:5432/dara_db
+      - POSTGRES_DB=dara_db
+      - POSTGRES_USER=dara_user
+      - POSTGRES_PASSWORD=dara_password
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

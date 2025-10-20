@@ -1,0 +1,33 @@
+# Docker Compose Override Example
+# Copy this file to docker-compose.override.yml to customize your local setup
+# docker-compose.override.yml is automatically loaded and merged with docker-compose.yml
+# This file is ignored by git (.gitignore)
+
+version: '3.8'
+
+services:
+  web:
+    # Example: Change port mapping
+    # ports:
+    #   - "8001:8000"
+    
+    # Example: Add environment variables
+    # environment:
+    #   - DEBUG=True
+    #   - CUSTOM_VAR=value
+    
+    # Example: Mount additional volumes
+    # volumes:
+    #   - ./custom_path:/app/custom_path
+
+  db:
+    # Example: Change database port
+    # ports:
+    #   - "5433:6543"
+    
+    # Example: Use custom credentials
+    # environment:
+    #   - POSTGRES_DB=my_custom_db
+    #   - POSTGRES_USER=my_user
+    #   - POSTGRES_PASSWORD=my_password
+

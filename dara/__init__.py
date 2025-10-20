@@ -1,0 +1,1 @@
+# Default Django app initialization
