@@ -4,8 +4,6 @@ from django.db import models
 from django.db.models import QuerySet
 from rest_framework.exceptions import ValidationError
 
-from user.models import User
-
 
 class PharmaCompany(models.Model):
     name = models.CharField(max_length=100)
@@ -27,7 +25,6 @@ class InsuranceCompany(models.Model):
 
 
 class Pharmacy(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     address = models.TextField()
     
@@ -35,8 +32,8 @@ class Pharmacy(models.Model):
         return self.name
 
     @staticmethod
-    def create(name: str, address: str, user: User) -> "Pharmacy":
-        return Pharmacy.objects.create(name=name, address=address, user=user)
+    def create(name: str, address: str) -> "Pharmacy":
+        return Pharmacy.objects.create(name=name, address=address)
 
 
 class Drug(models.Model):
@@ -54,26 +51,11 @@ class PharmacyItem(models.Model):
     explanation = models.TextField()
     expiration = models.DateTimeField()
     amount = models.IntegerField()
-    locked = models.IntegerField()
     price = models.IntegerField()
     
     
     def __str__(self):
-        return f"{self.drug.name} {self.pharma_company.name}" 
-    
-    def lock_amount(self, amount: int) -> None:
-        if self.amount - self.locked < amount:
-            raise ValidationError("Not enough items to lock")
-        else:
-            self.locked += amount
-            self.save(update_fields=["locked"])
-    
-    def unlock_amount(self, amount: int) -> None:
-        if self.locked < amount:
-            raise ValidationError("Not enough items to unlock")
-        else:
-            self.locked -= amount
-            self.save(update_fields=["locked"])
+        return f"{self.drug.name} {self.pharma_company.name}"
     
     def adjust_amount(self, amount: int) -> int:
         if self.amount + amount < 0:
