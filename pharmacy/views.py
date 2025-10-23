@@ -2,19 +2,18 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import transaction
+from dara.mixins import AuthenticatedAPIView
 from .models import PharmacyItem, Drug, PharmaCompany, Pharmacy
 
 
-class PharmacyItemView(APIView):
+class PharmacyItemView(AuthenticatedAPIView):
 
-    @staticmethod
-    def get(request):
+    def get(self, request):
         pharmacy_id = request.GET.get('pharmacy_id')
         pharmacy_items = PharmacyItem.objects.filter(pharmacy_id=pharmacy_id)
         return Response({'pharmacy_items': pharmacy_items})
     
-    @staticmethod
-    def post(request):
+    def post(self, request):
         data = request.data
         drug_name = data.get('drug_name')
         count = data.get('count')
@@ -78,8 +77,7 @@ class PharmacyItemView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
-    @staticmethod
-    def delete(request):
+    def delete(self, request):
         data = request.data
         item_id = data.get('item_id')
         count = data.get('count')

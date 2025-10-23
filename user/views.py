@@ -1,14 +1,13 @@
-from django.contrib.auth import authenticate
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import User as DjangoUser
+from django.contrib.auth import authenticate, get_user_model
 from rest_framework.authtoken.models import Token
+
 from user.models import User as CustomUser
 
 
+User: CustomUser = get_user_model()
 
 class LoginAPI(APIView):
     @staticmethod
@@ -23,7 +22,6 @@ class LoginAPI(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Authenticate with Django's built-in User model
         user = authenticate(username=username, password=password)
 
         if user:
@@ -32,9 +30,9 @@ class LoginAPI(APIView):
 
             # Try to get the custom user profile
             try:
-                custom_user = CustomUser.objects.get(name=user.username)
+                custom_user = User.objects.get(name=user.username)
                 user_role = custom_user.role
-            except CustomUser.DoesNotExist:
+            except User.DoesNotExist:
                 user_role = "unknown"
 
             return Response({
